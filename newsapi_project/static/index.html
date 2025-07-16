@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News Summary App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); margin: 0; min-height: 100vh; }
+        .container { max-width: 600px; margin: 60px auto 0 auto; background: #fff; border-radius: 14px; box-shadow: 0 4px 24px #0002; padding: 2.5em 2em 2em 2em; position: relative; }
+        h1 { text-align: center; color: #2563eb; letter-spacing: 1px; margin-bottom: 1.5em; }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2563eb;
+            border-radius: 8px;
+            padding: 0.5em 1em;
+            margin-bottom: 2em;
+            flex-wrap: wrap;
+        }
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1em;
+            font-weight: 500;
+            margin: 0 0.5em;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-btn.active, .nav-btn:hover {
+            background: #fff;
+            color: #2563eb;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 0.5em 1.2em;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 500;
+            margin-left: 0.5em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #ef444422;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #dc2626; }
+        .form-group { margin-bottom: 1.2em; }
+        label { display: block; margin-bottom: 0.3em; color: #475569; font-size: 1em; }
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%; padding: 0.8em; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 1em; background: #f1f5f9; transition: border 0.2s;
+        }
+        input:focus { border: 1.5px solid #2563eb; outline: none; }
+        button:not(.nav-btn):not(.logout-btn) { background: #2563eb; color: #fff; border: none; padding: 0.8em 1.5em; border-radius: 5px; font-size: 1em; cursor: pointer; margin-top: 0.5em; font-weight: 500; box-shadow: 0 2px 8px #2563eb22; transition: background 0.2s; }
+        button:disabled { background: #b2bec3; }
+        .news-list { margin-top: 2em; }
+        .news-item { background: #f8fafc; border-radius: 8px; margin-bottom: 1.5em; padding: 1.2em 1em; box-shadow: 0 1px 6px #2563eb11; border-left: 4px solid #2563eb22; }
+        .news-title { font-weight: bold; color: #1e293b; font-size: 1.1em; margin-bottom: 0.2em; }
+        .news-meta { font-size: 0.93em; color: #64748b; margin-bottom: 0.5em; }
+        .news-summary { margin: 0.7em 0; color: #334155; }
+        .save-btn { background: #22c55e; margin-left: 0.5em; box-shadow: 0 2px 8px #22c55e22; }
+        .save-btn:hover { background: #16a34a; }
+        .error, .success { color: #fff; padding: 0.5em 1em; border-radius: 4px; margin-bottom: 1em; font-size: 1em; letter-spacing: 0.2px; }
+        .error { background: #ef4444; }
+        .success { background: #22c55e; }
+        .search-bar { display: flex; gap: 0.5em; margin-bottom: 1em; }
+        .search-bar input { flex: 1; }
+        footer { text-align: center; color: #64748b; font-size: 1.1em; letter-spacing: 0.2px; position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 1em 0 0.7em 0; box-shadow: 0 -2px 12px #0001; z-index: 100; }
+        .footer-heart { color: #ef4444; font-size: 1.2em; vertical-align: middle; }
+        footer a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        footer a:hover { text-decoration: underline; }
+        @media (max-width: 700px) {
+            .container { max-width: 98vw; padding: 1em; }
+            .navbar { flex-direction: column; align-items: stretch; }
+            .nav-left, .nav-right { flex-direction: column; align-items: stretch; }
+            .nav-btn, .logout-btn { width: 100%; margin: 0.2em 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>News Summary App</h1>
+    <nav class="navbar" id="navbar">
+        <div class="nav-left" id="nav-left">
+            <button class="nav-btn" id="nav-login">Login</button>
+            <button class="nav-btn" id="nav-register">Register</button>
+            <button class="nav-btn" id="nav-latest" style="display:none;">Latest News</button>
+            <button class="nav-btn" id="nav-search" style="display:none;">Search</button>
+            <button class="nav-btn" id="nav-saved" style="display:none;">Saved News</button>
+        </div>
+        <div class="nav-right">
+            <button class="logout-btn" id="logoutBtn" style="display:none;">Logout</button>
+        </div>
+    </nav>
+    <div id="alerts"></div>
+    <div id="login-section">
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <div id="register-section" style="display:none;">
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="register-username">Username</label>
+                <input type="text" id="register-username" required>
+            </div>
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required>
+            </div>
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" required>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+    <div id="latest-section" style="display:none;">
+        <div class="news-list" id="latest-news-list"></div>
+    </div>
+    <div id="search-section" style="display:none;">
+        <form id="searchForm" class="search-bar">
+            <input type="text" id="search-query" placeholder="Search news..." required>
+            <button type="submit">Search</button>
+        </form>
+        <div class="news-list" id="search-news-list"></div>
+    </div>
+    <div id="saved-section" style="display:none;">
+        <div class="news-list" id="saved-news-list"></div>
+    </div>
+</div>
+<footer>
+    Made with <span class="footer-heart">&#10084;&#65039;</span> by <a href="http://tanish-poddar.is-a.dev/" target="_blank" rel="noopener">Tanish Poddar</a>
+</footer>
+<script>
+let accessToken = null;
+let latestNewsCache = null;
+
+function showAlert(msg, type = 'error') {
+    const alerts = document.getElementById('alerts');
+    alerts.innerHTML = `<div class="${type}">${msg}</div>`;
+    setTimeout(() => { alerts.innerHTML = ''; }, 4000);
+}
+
+function setTab(tab, pushState = true) {
+    // Remove active from all nav buttons
+    document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
+    // Show/hide sections
+    document.getElementById('login-section').style.display = (tab === 'login') ? '' : 'none';
+    document.getElementById('register-section').style.display = (tab === 'register') ? '' : 'none';
+    document.getElementById('latest-section').style.display = (tab === 'latest') ? '' : 'none';
+    document.getElementById('search-section').style.display = (tab === 'search') ? '' : 'none';
+    document.getElementById('saved-section').style.display = (tab === 'saved') ? '' : 'none';
+    // Set active nav button
+    if (document.getElementById('nav-' + tab)) {
+        document.getElementById('nav-' + tab).classList.add('active');
+    }
+    // Update URL
+    if (pushState) {
+        let url = '/';
+        if (tab === 'login') url = '/api/auth/login/';
+        else if (tab === 'register') url = '/api/auth/register/';
+        else if (tab === 'latest') url = '/api/news/latest/';
+        else if (tab === 'search') url = '/api/news/search/';
+        else if (tab === 'saved') url = '/api/news/saved/';
+        window.history.pushState({tab}, '', url);
+    }
+    // Fetch data if needed
+    if (tab === 'latest') fetchLatestNews();
+    if (tab === 'saved') fetchSavedNews();
+}
+
+function showAppTabs(show) {
+    document.getElementById('nav-latest').style.display = show ? '' : 'none';
+    document.getElementById('nav-search').style.display = show ? '' : 'none';
+    document.getElementById('nav-saved').style.display = show ? '' : 'none';
+    document.getElementById('logoutBtn').style.display = show ? '' : 'none';
+    document.getElementById('nav-login').style.display = show ? 'none' : '';
+    document.getElementById('nav-register').style.display = show ? 'none' : '';
+}
+
+// Navigation event listeners
+['login','register','latest','search','saved'].forEach(tab => {
+    const btn = document.getElementById('nav-' + tab);
+    if (btn) btn.onclick = () => setTab(tab);
+});
+
+// Handle browser navigation (back/forward)
+window.onpopstate = function(event) {
+    if (event.state && event.state.tab) {
+        setTab(event.state.tab, false);
+    } else {
+        setTab('login', false);
+    }
+};
+
+// Login
+const loginForm = document.getElementById('loginForm');
+loginForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    try {
+        const resp = await fetch('/api/auth/login/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await resp.json();
+        if (resp.ok && data.access) {
+            accessToken = data.access;
+            latestNewsCache = null; // Clear cache on new login
+            showAppTabs(true);
+            setTab('latest');
+        } else {
+            showAlert(data.detail || 'Login failed');
+        }
+    } catch (err) {
+        showAlert('Error: ' + err);
+    }
+};
+
+// Register
+const registerForm = document.getElementById('registerForm');
+registerForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    try {
+        const resp = await fetch('/api/auth/register/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        if (resp.ok) {
+            showAlert('Registration successful! Please login.', 'success');
+            setTab('login');
+        } else {
+            const data = await resp.json();
+            showAlert(data.detail || JSON.stringify(data));
+        }
+    } catch (err) {
+        showAlert('Error: ' + err);
+    }
+};
+
+// Logout
+const logoutBtn = document.getElementById('logoutBtn');
+logoutBtn.onclick = function() {
+    accessToken = null;
+    latestNewsCache = null; // Clear cache on logout
+    showAppTabs(false);
+    setTab('login');
+};
+
+// Fetch Latest News
+async function fetchLatestNews(forceReload = false) {
+    const list = document.getElementById('latest-news-list');
+    if (latestNewsCache && !forceReload) {
+        list.innerHTML = latestNewsCache.map(item => renderNewsItem(item, true)).join('');
+        addSaveListeners('latest');
+        return;
+    }
+    list.innerHTML = 'Loading...';
+    try {
+        const resp = await fetch('/api/news/latest/', {
+            headers: { 'Authorization': 'Bearer ' + accessToken }
+        });
+        if (!resp.ok) {
+            list.innerHTML = 'Error loading news.';
+            return;
+        }
+        const news = await resp.json();
+        latestNewsCache = news;
+        list.innerHTML = news.map(item => renderNewsItem(item, true)).join('');
+        addSaveListeners('latest');
+    } catch (err) {
+        list.innerHTML = 'Error: ' + err;
+    }
+}
+
+// Search News
+const searchForm = document.getElementById('searchForm');
+searchForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const query = document.getElementById('search-query').value;
+    const list = document.getElementById('search-news-list');
+    list.innerHTML = 'Searching...';
+    try {
+        const resp = await fetch('/api/news/search/?q=' + encodeURIComponent(query), {
+            headers: { 'Authorization': 'Bearer ' + accessToken }
+        });
+        if (!resp.ok) {
+            list.innerHTML = 'Error searching news.';
+            return;
+        }
+        const news = await resp.json();
+        list.innerHTML = news.map(item => renderNewsItem(item, true)).join('');
+        addSaveListeners('search');
+    } catch (err) {
+        list.innerHTML = 'Error: ' + err;
+    }
+};
+
+// Fetch Saved News
+async function fetchSavedNews() {
+    const list = document.getElementById('saved-news-list');
+    list.innerHTML = 'Loading...';
+    try {
+        const resp = await fetch('/api/news/saved/', {
+            headers: { 'Authorization': 'Bearer ' + accessToken }
+        });
+        if (!resp.ok) {
+            list.innerHTML = 'Error loading saved news.';
+            return;
+        }
+        const news = await resp.json();
+        list.innerHTML = news.map(item => renderNewsItem(item, false)).join('');
+    } catch (err) {
+        list.innerHTML = 'Error: ' + err;
+    }
+}
+
+// Render News Item
+function renderNewsItem(item, showSave) {
+    return `<div class="news-item">
+        <div class="news-title">${item.title}</div>
+        <div class="news-meta">${item.published_at || ''} | ${item.source || ''}</div>
+        <div class="news-summary">${item.summary || ''}</div>
+        <a href="${item.url}" target="_blank">Read more</a>
+        ${showSave ? `<button class="save-btn" data-title="${encodeURIComponent(item.title)}" data-url="${encodeURIComponent(item.url)}" data-summary="${encodeURIComponent(item.summary)}" data-published_at="${encodeURIComponent(item.published_at || '')}" data-source="${encodeURIComponent(item.source || '')}">Save</button>` : ''}
+    </div>`;
+}
+
+// Add Save Listeners
+function addSaveListeners(section) {
+    const list = document.getElementById(section === 'latest' ? 'latest-news-list' : 'search-news-list');
+    list.querySelectorAll('.save-btn').forEach(btn => {
+        btn.onclick = async function() {
+            const data = {
+                title: decodeURIComponent(btn.getAttribute('data-title')),
+                url: decodeURIComponent(btn.getAttribute('data-url')),
+                summary: decodeURIComponent(btn.getAttribute('data-summary')),
+                published_at: decodeURIComponent(btn.getAttribute('data-published_at')),
+                source: decodeURIComponent(btn.getAttribute('data-source')),
+            };
+            try {
+                const resp = await fetch('/api/news/save/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (resp.ok) {
+                    showAlert('News saved!', 'success');
+                } else {
+                    showAlert('Could not save news.');
+                }
+            } catch (err) {
+                showAlert('Error: ' + err);
+            }
+        };
+    });
+}
+
+// On load, show login tab and hide app tabs
+showAppTabs(false);
+// Set initial tab based on URL
+const path = window.location.pathname;
+if (path.startsWith('/api/auth/login')) setTab('login', false);
+else if (path.startsWith('/api/auth/register')) setTab('register', false);
+else if (path.startsWith('/api/news/latest')) setTab('latest', false);
+else if (path.startsWith('/api/news/search')) setTab('search', false);
+else if (path.startsWith('/api/news/saved')) setTab('saved', false);
+else setTab('login', false);
+</script>
+</body>
+</html> 

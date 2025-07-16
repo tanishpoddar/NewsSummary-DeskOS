@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Environment
+.env
+.env.*
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# PyCharm
+.idea/
+
+# Test coverage
+htmlcov/
+.coverage
+.tox/
+
+# Migrations (optional, if you want to ignore generated migrations)
+# news/migrations/*.py
+# !news/migrations/__init__.py 
