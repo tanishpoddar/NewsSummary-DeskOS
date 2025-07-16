@@ -6,7 +6,7 @@ import requests
 import json
 
 NEWSAPI_KEY = os.getenv('NEWSAPI_KEY')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyCUXnSac442kmZsrcJ1w59pTWh0_TX0H0k')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 NEWSAPI_BASE_URL = 'https://newsapi.org/v2/'
 
