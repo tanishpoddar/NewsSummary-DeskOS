@@ -19,7 +19,7 @@ SECRET_KEY = 'django-insecure-kc=ir%7+2xezv8ttok#rb4kv3)wbxio2&tp^8t)3u&c0_0wudg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['newssummary-deskos.up.railway.app', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
