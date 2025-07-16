@@ -39,8 +39,7 @@ DeskOS/
    ```
 3. **Set environment variables**
    - `NEWSAPI_KEY`: Your NewsAPI key
-   - `GEMINI_API_KEY`: (Optional) Your Gemini API key (default is provided, but you should use your own for production)
-   - You can use a `.env` file in the project root.
+   - `GEMINI_API_KEY`: Your Gemini API key
 4. **Run migrations**
    ```bash
    python manage.py migrate
